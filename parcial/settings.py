@@ -105,11 +105,19 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
 # --- CONFIGURACIÓN ESPECÍFICA DE RENDER ---
+# --- CONFIGURACIÓN ESPECÍFICA DE RENDER ---
 if 'RENDER' in os.environ:
     ALLOWED_HOSTS = ['sistema-alumnos-mxzq.onrender.com', 'localhost', '127.0.0.1']
     DEBUG = False
     
-    # SOLUCIÓN CRASH 502:
-    # Usamos el backend de consola en Render para que no se cuelgue intentando conectar con Gmail.
-    # El email de bienvenida aparecerá en los LOGS, no se enviará realmente.
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    # AHORA SÍ: Activamos el envío real de correos vía SMTP
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    
+    # Seguridad para HTTPS
+    CSRF_TRUSTED_ORIGINS = ['https://sistema-alumnos-mxzq.onrender.com']
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    # Configuración Local
+    ALLOWED_HOSTS = ['*']
+    DEBUG = True
