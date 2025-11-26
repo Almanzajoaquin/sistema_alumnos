@@ -5,9 +5,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-temporal-12345')
 
-DEBUG = True  # Cambiar a True temporalmente
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Permitir todos temporalmente
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,6 +22,10 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
 ]
+
+# CONFIGURACIÓN CRISPY FORMS - ESTO FALTABA
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -54,7 +58,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'parcial.wsgi.application'
 
-# SOLO SQLite - más simple
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
