@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Buscador Educativo - Sistema Académico{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h4 class="card-title mb-0">Buscador de Contenido Educativo</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong><i class="fas fa-lightbulb"></i> Sugerencia:</strong> 
+                    Busca términos educativos como "matemáticas", "historia", "ciencias", "programación", etc.
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-9">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="palabra_clave" class="form-control" 
+                                       placeholder="Ingrese término educativo para buscar..." 
+                                       value="{{ palabra_clave }}" required minlength="2">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if resultados %}
+                <div class="mt-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-1">Resultados de Búsqueda</h5>
+                            <p class="text-muted mb-0">Término: "{{ palabra_clave }}"</p>
+                        </div>
+                        <form method="post" action="{% url 'enviar_resultados' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="palabra_clave" value="{{ palabra_clave }}">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Enviar por Email
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="25%">Título</th>
+                                    <th width="55%">Contenido</th>
+                                    <th width="20%">Fuente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resultado in resultados %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ resultado.titulo }}</strong>
+                                        {% if resultado.url != '#' %}
+                                        <br>
+                                        <small>
+                                            <a href="{{ resultado.url }}" target="_blank" class="text-decoration-none">
+                                                <i class="fas fa-external-link-alt"></i> Ver fuente
+                                            </a>
+                                        </small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted">{{ resultado.contenido }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if resultado.fuente == 'Wikipedia' %}bg-primary
+                                            {% elif resultado.fuente == 'Recurso Educativo' %}bg-success
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ resultado.fuente }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

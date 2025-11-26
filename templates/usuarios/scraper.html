@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Scraper Educativo - Sistema de Alumnos{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Scraper Educativo</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-8">
+                            <input type="text" name="palabra_clave" class="form-control" 
+                                   placeholder="Ingrese palabra clave para buscar..." 
+                                   value="{{ palabra_clave }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                        </div>
+                    </div>
+                </form>
+
+                {% if resultados %}
+                <div class="mt-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Resultados para "{{ palabra_clave }}"</h5>
+                        <form method="post" action="{% url 'enviar_resultados' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="palabra_clave" value="{{ palabra_clave }}">
+                            <button type="submit" class="btn btn-success btn-sm">Enviar Resultados por Email</button>
+                        </form>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Contenido</th>
+                                    <th>Fuente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resultado in resultados %}
+                                <tr>
+                                    <td><strong>{{ resultado.titulo }}</strong></td>
+                                    <td>{{ resultado.contenido }}</td>
+                                    <td>{{ resultado.fuente }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

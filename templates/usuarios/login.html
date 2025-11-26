@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Iniciar Sesión - Sistema Académico{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h4 class="card-title mb-0">Iniciar Sesión</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary w-100 mt-3 py-2">
+                        <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
+                    </button>
+                </form>
+                <hr class="my-4">
+                <p class="text-center mb-0">¿No tienes cuenta? 
+                    <a href="{% url 'registro' %}" class="btn btn-outline-primary btn-sm ms-2">Crear Cuenta</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

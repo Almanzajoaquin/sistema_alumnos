@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if object %}Editar{% else %}Nuevo{% endif %} Alumno - Sistema Académico{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h4 class="card-title mb-0">
+                    <i class="fas {% if object %}fa-edit{% else %}fa-user-plus{% endif %}"></i>
+                    {% if object %}Editar{% else %}Registrar Nuevo{% endif %} Alumno
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.nombre|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.apellido|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.edad|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form.estado|as_crispy_field }}
+                        </div>
+                    </div>
+                    {{ form.carrera|as_crispy_field }}
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-success me-2">
+                            <i class="fas fa-save"></i> Guardar Alumno
+                        </button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
