@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-temporal-12345')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Se define como True por defecto, pero se cambia a False en el bloque RENDER de abajo
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -65,7 +64,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'parcial.wsgi.application'
 
 # Database
-# NOTA: En Render esto usa SQLite efímero (se borra al reiniciar).
+# NOTA: SQLite en Render es efímero (se resetea con cada deploy).
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -95,18 +94,15 @@ LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
 
 
-# --- CONFIGURACIÓN DE EMAIL (DINÁMICA) ---
-# Lee los datos de las variables de entorno de Render.
-# Si no existen las variables, usa valores por defecto (útil para local).
+# --- CONFIGURACIÓN DE EMAIL ---
+# Por defecto (en local) intentará usar SMTP si tienes las variables, 
+# pero lo importante es lo que pasa abajo en el bloque de RENDER.
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-# Estos valores se llenarán con lo que pongas en "Environment" en Render
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'tu_email_local@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'tu_pass_local')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 
 
 # --- CONFIGURACIÓN ESPECÍFICA DE RENDER ---
@@ -116,12 +112,16 @@ if 'RENDER' in os.environ:
     
     # Desactivar modo debug por seguridad
     DEBUG = False
+
+    # === PLAN A: SOLUCIÓN ANTI-CRASH ===
+    # En lugar de intentar enviar el email (y fallar), lo escribimos en la consola.
+    # Así el registro se completa y no da error 502.
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     
     # Seguridad adicional para formularios y HTTPS
     CSRF_TRUSTED_ORIGINS = ['https://sistema-alumnos-mxzq.onrender.com']
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # HSTS settings (Opcional, fuerza HTTPS)
     SECURE_SSL_REDIRECT = True
 else:
     # Configuración Local
