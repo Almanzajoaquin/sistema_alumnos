@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# Exit on error
 set -o errexit
 
-# Install Python dependencies
+# Instalar dependencias
 pip install -r requirements.txt
 
-# Convert static asset files
+# Colectar archivos estáticos
 python manage.py collectstatic --no-input
 
-# Apply any outstanding database migrations
-python manage.py migrate
+# Aplicar migraciones de la base de datos
+python manage.py makemigrations --no-input
+python manage.py migrate --no-input
