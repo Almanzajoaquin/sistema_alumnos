@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clave-temporal-12345')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Se sobrescribe abajo si estamos en Render
+# Se define como True por defecto, pero se cambia a False en el bloque RENDER de abajo
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -20,9 +20,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Mis apps
     'usuarios',
     'alumnos',
     'scraper',
+    # Librerías de terceros
     'crispy_forms',
     'crispy_bootstrap5',
 ]
@@ -33,7 +35,7 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Manejo de archivos estáticos en Render
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Vital para archivos estáticos en Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -63,8 +65,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'parcial.wsgi.application'
 
 # Database
-# ADVERTENCIA: Estás usando SQLite en Render.
-# Los datos se borrarán cada vez que hagas un nuevo deploy.
+# NOTA: En Render esto usa SQLite efímero (se borra al reiniciar).
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -84,7 +85,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
-# Configuración recomendada de Whitenoise para producción
+# Configuración de Whitenoise para servir archivos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -94,29 +95,34 @@ LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
 
 
-# --- CONFIGURACIÓN DE EMAIL GENERAL ---
+# --- CONFIGURACIÓN DE EMAIL (DINÁMICA) ---
+# Lee los datos de las variables de entorno de Render.
+# Si no existen las variables, usa valores por defecto (útil para local).
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'almanzajoaquin25@gmail.com')
-# La contraseña se lee de las variables de entorno por seguridad
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+
+# Estos valores se llenarán con lo que pongas en "Environment" en Render
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'tu_email_local@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'tu_pass_local')
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-# --- CONFIGURACIÓN ESPECÍFICA DE RENDER ---
 # --- CONFIGURACIÓN ESPECÍFICA DE RENDER ---
 if 'RENDER' in os.environ:
+    # Hosts permitidos en producción
     ALLOWED_HOSTS = ['sistema-alumnos-mxzq.onrender.com', 'localhost', '127.0.0.1']
+    
+    # Desactivar modo debug por seguridad
     DEBUG = False
     
-    # AHORA SÍ: Activamos el envío real de correos vía SMTP
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    
-    # Seguridad para HTTPS
+    # Seguridad adicional para formularios y HTTPS
     CSRF_TRUSTED_ORIGINS = ['https://sistema-alumnos-mxzq.onrender.com']
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    # HSTS settings (Opcional, fuerza HTTPS)
+    SECURE_SSL_REDIRECT = True
 else:
     # Configuración Local
     ALLOWED_HOSTS = ['*']
